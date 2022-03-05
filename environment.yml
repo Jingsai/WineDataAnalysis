@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+dependencies:
+  - streamlit
+  - numpy
+  - matplotlib
+  - pandas
+  - sklearn
+  - scipy
