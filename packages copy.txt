@@ -1,6 +1,0 @@
-streamlit1.7.0
-numpy1.20.3
-matplotlib3.4.3
-pandas1.3.4
-sklearn0.24.2
-scipy1.7.1

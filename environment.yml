@@ -1,3 +1,4 @@
+name: wine-data-analysis
 channels:
   - conda-forge
 dependencies:

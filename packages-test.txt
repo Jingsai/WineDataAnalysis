@@ -1,6 +1,0 @@
-streamlit-dev
-numpy-dev
-matplotlib-dev
-pandas-dev
-sklearn-dev
-scipy-dev
