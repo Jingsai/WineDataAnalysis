@@ -9,33 +9,38 @@ from scipy.cluster.hierarchy import dendrogram
 from sklearn import preprocessing
 import re
 
+st.set_page_config(layout="wide")
 st.title("Wine Data Analysis")
 
-uploaded_samples = st.file_uploader("Choose a file", key=1)
-flag_samples = False
-if uploaded_samples is not None:
-    flag_samples = True
-    # df1=pd.read_excel('https://cs.westminstercollege.edu/~jingsai/project/Wine%20data%20from%202020%20Chem%20307,%202-6-22.xlsx')
-    df1=pd.read_excel(uploaded_samples)
-    df1.set_index(df1.columns[0], inplace=True) # move sample ID as row name
-    df1.columns = df1.columns.str.extract("\[(\w+)\]", expand=False)
-    # df1.head()
+col1, col2 = st.columns((2,3))
 
-    st.subheader('Samples')
-    st.write(df1)
+with col1:
+    st.subheader('Load Training and Testing Data:')
+    uploaded_samples = st.file_uploader("Choose a training set", key=1)
+    flag_samples = False
+    if uploaded_samples is not None:
+        flag_samples = True
+        # df1=pd.read_excel('https://cs.westminstercollege.edu/~jingsai/project/Wine%20data%20from%202020%20Chem%20307,%202-6-22.xlsx')
+        df1=pd.read_excel(uploaded_samples)
+        df1.set_index(df1.columns[0], inplace=True) # move sample ID as row name
+        df1.columns = df1.columns.str.extract("\[(\w+)\]", expand=False)
+        # df1.head()
 
-uploaded_tests= st.file_uploader("Choose a file", key=2)
-flag_tests = False
-if uploaded_tests is not None:
-    flag_tests = True
-    # df2=pd.read_excel('Wine data from 2022 Chem 307, 2-27-22.xlsx')
-    df2=pd.read_excel(uploaded_tests)
-    df2.set_index(df2.columns[0], inplace=True) # move sample ID as row name
-    df2.columns = df2.columns.str.extract("\[(\w+)\]", expand=False)
-    df2.index = "Test" + df2.index
+        st.subheader('Training Set:')
+        st.write(df1)
 
-    st.subheader('Tests')
-    st.write(df2)
+    uploaded_tests= st.file_uploader("Choose a testing set", key=2)
+    flag_tests = False
+    if uploaded_tests is not None:
+        flag_tests = True
+        # df2=pd.read_excel('Wine data from 2022 Chem 307, 2-27-22.xlsx')
+        df2=pd.read_excel(uploaded_tests)
+        df2.set_index(df2.columns[0], inplace=True) # move sample ID as row name
+        df2.columns = df2.columns.str.extract("\[(\w+)\]", expand=False)
+        df2.index = "Test" + df2.index
+
+        st.subheader('Testing Set:')
+        st.write(df2)
 
 def find_group(label,plot=False):
     df = pd.concat([df1, df2.loc[[label],:]]).dropna(axis=1)
@@ -134,22 +139,28 @@ def Show_Clusters(model, sample_name):
     # result.index.name = 'index'
     return result
 
-if flag_samples and flag_tests:
+with col2:
+    st.subheader("Show Testing Results:")
+    if flag_samples and flag_tests:
 
-    menu = list(df2.index)
-    menu.insert(0, '<Select>')
-    option = st.selectbox(
-     'Please select a wine to test:',
-     menu, index=0)
+        menu = list(df2.index)
+        menu.insert(0, '<Select>')
+        option = st.selectbox(
+        'Please select a wine to test:',
+        menu, index=0)
 
-    if option != '<Select>':
-        st.write('You selected:', option)
-        group = find_group(option, True)
-        st.write(group)
+        if option != '<Select>':
+            st.write('You selected:', option)
+            st.write('Testing result:')
+            group = find_group(option)
+            for r in group:
+                st.text(r)
+            st.write('Hierarchical Clustering Tree:')
+            find_group(option, True)
 
-    # groups = []
-    # for index in df2.index:
-    #     # print(index)
-    #     groups.append(find_group(index))
-        
-    # st.write(pd.Series(groups, index=df2.index))
+        # groups = []
+        # for index in df2.index:
+        #     # print(index)
+        #     groups.append(find_group(index))
+            
+        # st.write(pd.Series(groups, index=df2.index))
