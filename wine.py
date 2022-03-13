@@ -42,7 +42,7 @@ with col1:
         st.subheader('Testing Set:')
         st.write(df2)
 
-def find_group(label,plot=False):
+def find_group(label,p,linkage = "average", plot=False):
     df = pd.concat([df1, df2.loc[[label],:]]).dropna(axis=1)
     # print(df2.loc[[label],:])
     # print(df)
@@ -54,13 +54,14 @@ def find_group(label,plot=False):
 
     df['ID']=list(range(df.shape[0]))
 
-    model = Run_Agg_Clustering(n_clusters = None, data=data, distance_threshold=0)
+    model = Run_Agg_Clustering(n_clusters = None, data=data, linkage = linkage, distance_threshold=0)
 
     labels = find_labels(label, model, df)
     
     if plot:
         Plot_Dendrogram(model, 
-                    truncate_mode=None,
+                    truncate_mode="lastp",
+                    p = p,
                     fig_size = (20,10), 
                     leaf_font_size = 12, 
                     label_font_size = 15, 
@@ -92,8 +93,8 @@ def find_labels(label, model, df):
     leaves = [df.index[df['ID'] == leaf] for leaf in groups_leaf]
     return [list(leaves[i])[0] for i in range(len(leaves))]
 
-def Run_Agg_Clustering(n_clusters,data,  **kwargs):
-    model = Agg(linkage="average", n_clusters = n_clusters, **kwargs)
+def Run_Agg_Clustering(n_clusters, data, linkage, **kwargs):
+    model = Agg(linkage=linkage, n_clusters = n_clusters, **kwargs)
     model = model.fit(data)
     return model
 
@@ -148,15 +149,22 @@ with col2:
         option = st.selectbox(
         'Please select a wine to test:',
         menu, index=0)
+        
+        linkage = st.selectbox(
+        'Please select a linkage:',
+        ['ward', 'complete', 'average', 'single'])
+
+        p = st.slider("Please pick the number of clusters", 1, df1.shape[0]+1, value=df1.shape[0]+1)
 
         if option != '<Select>':
             st.write('You selected:', option)
-            st.write('Testing result:')
-            group = find_group(option)
+            st.write('Testing result:') 
+            # show group before showing plot 
+            group = find_group(label=option, p=int(p), linkage=linkage, plot=False)
             for r in group:
                 st.text(r)
             st.write('Hierarchical Clustering Tree:')
-            find_group(option, True)
+            find_group(label=option, p=int(p), linkage=linkage, plot=True)
 
         # groups = []
         # for index in df2.index:
